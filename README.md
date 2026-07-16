@@ -34,7 +34,7 @@ This isn't a CRUD toy app — it's containerized, has a CI pipeline that runs on
 
 ```mermaid
 flowchart TD
-    A["🖥️ Frontend<br/>HTML · CSS · JS · Jinja2"] --> B["⚙️ Flask Backend<br/>REST APIs"]
+    A["🖥️ Frontend<br/>HTML · CSS · JS"] --> B["⚙️ Flask Backend<br/>REST APIs"]
     B --> C["🔐 Auth Layer<br/>Session-Based · RBAC"]
     B --> D["📋 Business Logic<br/>Projects · Tasks · Operations"]
     D --> E["🗄️ PostgreSQL<br/>(Supabase)"]
@@ -126,7 +126,7 @@ flowchart TD
 
 | Layer | Technology |
 |---|---|
-| **Frontend** | HTML5, CSS3, JavaScript, Jinja2 Templates |
+| **Frontend** | HTML5, CSS3, JavaScript |
 | **Backend** | Python, Flask, REST APIs |
 | **Database** | PostgreSQL (Supabase) |
 | **DevOps** | Docker, Git, GitHub Actions (CI), Render |
@@ -167,11 +167,6 @@ Project-Operations-Manager/
 │
 ├── backend/
 │   ├── app.py
-│   ├── auth/           # Login, signup, session & RBAC logic
-│   ├── database/       # Models & DB connection layer
-│   ├── projects/       # Project CRUD & logic
-│   ├── tasks/           # Task assignment & tracking
-│   └── operations/     # Issue reporting & ops monitoring
 │
 ├── frontend/
 │   ├── static/
@@ -195,7 +190,7 @@ Project-Operations-Manager/
 
 ### 1. Clone the repository
 ```bash
-git clone <repository-url>
+git clone [https://github.com/Tanmay1113/P-Op-s.git]
 cd Project-Operations-Manager
 ```
 
