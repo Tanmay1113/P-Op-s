@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import psycopg2
-from supabase import create_client, Client
 
 from dotenv import load_dotenv
 import os

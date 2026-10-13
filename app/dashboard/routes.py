@@ -1,6 +1,5 @@
-from flask import render_template, redirect, url_for
+from flask import render_template
 from flask_login import current_user, login_required
-from sqlalchemy import func
 from ..extensions import db
 from ..models import User, Project, Task, Operation
 from . import bp

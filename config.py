@@ -1,9 +1,8 @@
 import os
-from dotenv import load_dotenv
 from datetime import timedelta
+from dotenv import load_dotenv
 
 load_dotenv()
-from urllib.parse import urlparse, urlunparse
 
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY")
