@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Workspace | Project & Operations Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="admin-body">
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <span class="logo-icon">■</span>
+            <span class="logo-text">Ops Manager</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#overview" class="nav-item active">Dashboard</a>
+            <a href="#projects" class="nav-item">My Projects</a>
+            <a href="#tasks" class="nav-item">My Tasks</a>
+            <a href="#operations" class="nav-item">Operations</a>
+            <a href="#reports" class="nav-item">Reports</a>
+            <a href="#profile" class="nav-item">Profile</a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/logout" class="logout-link">Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        
+        <header class="top-navbar">
+            <div class="nav-left">
+                <h2>My Workspace</h2>
+            </div>
+            <div class="nav-right">
+                <div class="notification-icon" onclick="toggleModal('notificationsModal', true)">
+                    🔔<span class="badge">4</span>
+                </div>
+                <div class="user-profile">
+                    <span><strong>{{ session['user_name'] }}</strong> <span class="role-badge employee-badge">Employee</span></span>
+                    <small>Engineering & Ops Team</small>
+                </div>
+            </div>
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert-banner">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <section id="overview" class="stats-grid">
+            <div class="stat-card">
+                <small>Assigned Projects</small>
+                <h3>{{ assigned_projects }}</h3>
+                <div class="stat-indicator blue">Active Teams</div>
+            </div>
+            <div class="stat-card">
+                <small>Total Tasks</small>
+                <h3>{{ total_tasks }}</h3>
+                <div class="stat-indicator text-muted">All Time Allocation</div>
+            </div>
+            <div class="stat-card">
+                <small>Pending Tasks</small>
+                <h3>{{ pending_tasks }}</h3>
+                <div class="stat-indicator orange">Action Required</div>
+            </div>
+            <div class="stat-card">
+                <small>Completed Tasks</small>
+                <h3>{{ completed_tasks }}</h3>
+                <div class="stat-indicator plus">Closed Milestones</div>
+            </div>
+            <div class="stat-card">
+                <small>Overdue Tasks</small>
+                <h3 class="text-danger">{{ overdue_tasks }}</h3>
+                <div class="stat-indicator red">Past Due Date</div>
+            </div>
+            <div class="stat-card">
+                <small>Open Issues</small>
+                <h3>2</h3>
+                <div class="stat-indicator red">Blockers Pending</div>
+            </div>
+        </section>
+
+        <section id="projects" class="content-section">
+            <div class="section-header">
+                <h3>My Assigned Projects</h3>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Project ID</th>
+                            <th>Project Name</th>
+                            <th>Manager Name</th>
+                            <th>Status</th>
+                            <th>Deadline</th>
+                            <th>Progress</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for project in projects %}
+                        <tr>
+                            <td>#PRJ-{{ project[0] }}</td>
+                            <td><strong>{{ project[1] }}</strong></td>
+                            <td>{{ project[2] }}</td>
+                            <td><span class="status-pill active">{{ project[3] }}</span></td>
+                            <td>{{ project[4] }}</td>
+                            <td>
+                                <div class="progress-wrapper">
+                                    <small style="font-weight: 600;">{{ project[5] }}%</small>
+                                    <div class="progress-bg"><div class="progress-fill" style="width: {{ project[5] }}%"></div></div>
+                                </div>
+                            </td>
+                            <td><button class="action-btn">View Details</button></td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">You are not currently assigned to any active project vectors.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="tasks" class="content-section">
+            <div class="section-header">
+                <h3>My Tasks & Deliverables</h3>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Task ID</th>
+                            <th>Task Name</th>
+                            <th>Project</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Due Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks %}
+                        <tr>
+                            <td>#TSK-{{ task[0] }}</td>
+                            <td><strong>{{ task[1] }}</strong></td>
+                            <td>{{ task[2] }}</td>
+                            <td><span class="priority-tag {{ task[3]|lower }}">{{ task[3] }}</span></td>
+                            <td><span class="action-tag">{{ task[4] }}</span></td>
+                            <td>{{ task[5] }}</td>
+                            <td>
+                                <button class="action-btn" onclick="openTaskModal('{{ task[0] }}', '{{ task[1] }}', '{{ task[2] }}', '{{ task[3] }}', '{{ task[5] }}')">View</button>
+                                <button class="action-btn" onclick="openUpdateStatusModal('{{ task[0] }}', '{{ task[4] }}')">Update Status</button>
+                                <form action="/employee/complete-task" method="POST" style="display:inline;">
+                                    <input type="hidden" name="task_id" value="{{ task[0] }}">
+                                    <button type="submit" class="action-btn green-btn">Complete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No backlog tasks assigned to your profile array.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="operations" class="content-section">
+            <div class="section-header">
+                <h3>Reported Operational Issues</h3>
+                <button class="btn btn-danger-box" onclick="toggleModal('reportIssueModal', true)">⚠️ Report Issue</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Incident ID</th>
+                            <th>Title / Summary</th>
+                            <th>Severity</th>
+                            <th>Status</th>
+                            <th>Reported Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for operation in operations %}
+                        <tr>
+                            <td>#INC-{{ operation[0] }}</td>
+                            <td><strong>{{ operation[1] }}</strong></td>
+                            <td><span class="priority-tag {{ operation[2]|lower }}">{{ operation[2] }}</span></td>
+                            <td><span class="status-pill active">{{ operation[3] }}</span></td>
+                            <td>{{ operation[4] }}</td>
+                            <td><button class="action-btn">View Status</button></td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No recorded workspace incident flags raised by you.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="reports" class="content-section">
+            <div class="section-header">
+                <h3>My Work Performance Metrics</h3>
+            </div>
+            <div class="analytics-row-grid">
+                <div class="metric-block-card">
+                    <h4>Task Completion Rate</h4>
+                    <div class="chart-mock-placeholder">
+                        <div class="circular-progress-mock" style="border-color: #10b981;">88%</div>
+                    </div>
+                </div>
+                <div class="metric-block-card">
+                    <h4>Weekly Productivity Balance</h4>
+                    <div class="chart-mock-placeholder">
+                        <div class="bar-chart-mock">
+                            <div class="bar-fill" style="height:45%;"></div>
+                            <div class="bar-fill" style="height:70%;"></div>
+                            <div class="bar-fill" style="height:85%;"></div>
+                            <div class="bar-fill" style="height:95%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-block-card">
+                    <h4>Upcoming Target Deadlines</h4>
+                    <ul class="simple-metric-list">
+                        <li>⏳ Database Indices Deployment: <strong class="text-danger">In 2 Days</strong></li>
+                        <li>📅 Core UI Component Review: <strong>In 5 Days</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="taskDetailsModal" class="modal">
+        <div class="modal-content modal-lg">
+            <span class="close" onclick="toggleModal('taskDetailsModal', false)">&times;</span>
+            <h3 id="m-task-name">Task Name Holder</h3>
+            <p style="color: #64748b; font-size: 0.9rem;" id="m-project-name">Project Framework Association</p>
+            
+            <div class="modal-split-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem; margin-top:1.5rem;">
+                <div>
+                    <h4>Task Details</h4>
+                    <p class="meta-txt"><strong>Priority:</strong> <span id="m-priority">High</span></p>
+                    <p class="meta-txt"><strong>Target Due Date:</strong> <span id="m-due-date">2026-06-30</span></p>
+                    <p class="meta-txt" style="margin-top:0.75rem;"><strong>Description Statement:</strong></p>
+                    <p style="font-size:0.9rem; background:#f8fafc; padding:0.75rem; border-radius:4px; border:1px solid #e2e8f0;">
+                        Execute sprint dependencies parameters safely. Complete optimization processes and perform verification tracking.
+                    </p>
+                </div>
+                <div>
+                    <h4>Work Logs & Updates</h4>
+                    <div class="comments-section" style="height:110px; overflow-y:auto; font-size:0.85rem; border:1px solid #e2e8f0; padding:0.5rem; border-radius:4px; margin-bottom:0.5rem;">
+                        <p style="margin-bottom:0.35rem;">💬 <strong>You:</strong> Initial configuration branch verified. (Yesterday)</p>
+                    </div>
+                    <form action="/employee/add-comment" method="POST">
+                        <input type="hidden" name="task_id" id="m-comment-task-id">
+                        <input type="text" name="comment" placeholder="Add progress log..." style="width:100%; padding:0.4rem; font-size:0.85rem; margin-bottom:0.5rem;" required>
+                        <button type="submit" class="btn btn-secondary" style="padding:0.3rem 0.6rem; font-size:0.8rem;">Post Update</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="updateStatusModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleModal('updateStatusModal', false)">&times;</span>
+            <h3>Update Execution Pipeline Status</h3>
+            <form action="/employee/update-task-status" method="POST" style="margin-top:1rem;">
+                <input type="hidden" name="task_id" id="status-task-id">
+                <div class="form-group">
+                    <label>Pipeline Priority Lifecycle Node</label>
+                    <select name="status" id="status-dropdown" class="form-select">
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Under Review">Under Review</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Commit Status Change</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="reportIssueModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleModal('reportIssueModal', false)">&times;</span>
+            <h3>Log Operational Roadblock Blockade</h3>
+            <form action="/employee/report-issue" method="POST" style="margin-top:1rem;">
+                <div class="form-group">
+                    <label>Incident Summary Title</label>
+                    <input type="text" name="title" required placeholder="Ex: API Environment timeout failure">
+                </div>
+                <div class="form-group">
+                    <label>Blocker Criticality Severity Level</label>
+                    <select name="severity" class="form-select">
+                        <option value="Low">Low (Minor Delay)</option>
+                        <option value="Medium">Medium (Feature Blocked)</option>
+                        <option value="High">High (Total Outage)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-danger-box w-100" style="color:white;">Log Blocker Instance</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="notificationsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleModal('notificationsModal', false)">&times;</span>
+            <h3>Workspace Notifications Hub</h3>
+            <div class="notif-list" style="margin-top:1rem; display:flex; flex-direction:column; gap:0.75rem;">
+                <div class="notif-item">🔔 <strong>New Task Assigned:</strong> Database indices metrics tuning. <small>(1h ago)</small></div>
+                <div class="notif-item">⚠️ <strong>Deadline Approaching:</strong> API Framework validation due in 48 hours.</div>
+                <div class="notif-item">⚙️ <strong>Project Update:</strong> Security policy baseline altered by Manager.</div>
+                <div class="notif-item">✓ <strong>Incident Status:</strong> Production outback ticket marked resolved.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleModal(id, show) {
+            document.getElementById(id).style.display = show ? "flex" : "none";
+        }
+
+        function openTaskModal(id, name, project, priority, due) {
+            document.getElementById('m-task-name').innerText = name;
+            document.getElementById('m-project-name').innerText = "Project: " + project;
+            document.getElementById('m-priority').innerText = priority;
+            document.getElementById('m-due-date').innerText = due;
+            document.getElementById('m-comment-task-id').value = id;
+            toggleModal('taskDetailsModal', true);
+        }
+
+        function openUpdateStatusModal(id, currentStatus) {
+            document.getElementById('status-task-id').value = id;
+            document.getElementById('status-dropdown').value = currentStatus;
+            toggleModal('updateStatusModal', true);
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = "none";
+            }
+        }
+        // Quick script to handle tab switching inside a single file layout
+document.querySelectorAll('.nav-item').forEach(link => {
+    link.addEventListener('click', function(e) {
+        // Remove active class from all navigation nodes
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Hide all major dashboard content blocks
+        document.querySelectorAll('.content-section').forEach(section => section.style.display = 'none');
+        
+        // Unhide target choice layout explicitly
+        const targetId = this.getAttribute('href').substring(1);
+        const targetSection = document.getElementById(targetId);
+        if(targetSection) targetSection.style.display = 'block';
+    });
+});
+    </script>
+</body>
+</html>

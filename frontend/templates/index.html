@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project & Operations Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <span class="logo-box">■</span>
+                <strong>Project & Operations Manager</strong>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-text" onclick="toggleModal('loginModal', true)">Login</button>
+                <button class="btn btn-primary" onclick="toggleModal('signupModal', true)">Sign Up</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container hero-grid">
+                <div class="hero-text">
+                    <h1>Manage Projects, Tasks and Operations Efficiently</h1>
+                    <p>A centralized platform for managing projects, assigning tasks, tracking operational activities, monitoring progress, and improving team productivity.</p>
+                    <div class="hero-cta">
+                        <button class="btn btn-primary" onclick="toggleModal('loginModal', true)">Login to System</button>
+                        <button class="btn btn-secondary" onclick="toggleModal('signupModal', true)">Create Account</button>
+                    </div>
+                </div>
+                
+                <div class="hero-image">
+                    <div class="mockup-window">
+                        <div class="mockup-bar">
+                            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                        </div>
+                        <div class="mockup-content">
+                            <div class="mockup-card">
+                                <h3>Project Status</h3>
+                                <div class="progress-bar"><div class="progress-fill" style="width: 75%;"></div></div>
+                            </div>
+                            <div class="mockup-card">
+                                <h3>Pending Tasks</h3>
+                                <p>✓ Review system logs</p>
+                                <p>⬚ Update access list</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="container msg-container">
+              {% for message in messages %}
+                <div class="flash-msg">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Application Features</h2>
+                <div class="features-grid">
+                    <div class="card">
+                        <h3>📁 Project Management</h3>
+                        <p>Plan, organize, and manage corporate projects from start to finish.</p>
+                    </div>
+                    <div class="card">
+                        <h3>🎯 Task Assignment</h3>
+                        <p>Assign tasks directly to team members and set clear priorities.</p>
+                    </div>
+                    <div class="card">
+                        <h3>⚙️ Operations Tracking</h3>
+                        <p>Monitor daily operational activities and routine processes smoothly.</p>
+                    </div>
+                    <div class="card">
+                        <h3>👥 Team Collaboration</h3>
+                        <p>Keep your internal team aligned with shared progress dashboards.</p>
+                    </div>
+                    <div class="card">
+                        <h3>📊 Analytics Dashboard</h3>
+                        <p>Track team velocity and operational performance metrics over time.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section bg-alt">
+            <div class="container">
+                <h2 class="section-title">How It Works</h2>
+                <div class="steps-grid">
+                    <div class="step">
+                        <div class="step-num">1</div>
+                        <h4>Create Projects</h4>
+                        <p>Set up your project workspace and define core targets.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">2</div>
+                        <h4>Assign Tasks</h4>
+                        <p>Distribute specific tasks to team members quickly.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">3</div>
+                        <h4>Track Progress</h4>
+                        <p>Watch updates unfold in real time on your status boards.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">4</div>
+                        <h4>Monitor Operations</h4>
+                        <p>Keep regular system workflows running smoothly.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">5</div>
+                        <h4>Analyze Performance</h4>
+                        <p>Review standard analytics logs to keep optimizing results.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">System Highlights</h2>
+                <div class="highlights-grid">
+                    <div class="highlight-box">
+                        <h4>Role Based Access</h4>
+                        <p>Secure permission tiers depending on employee designation.</p>
+                    </div>
+                    <div class="highlight-box">
+                        <h4>Secure Authentication</h4>
+                        <p>Strict access tokens ensure data safety across sessions.</p>
+                    </div>
+                    <div class="highlight-box">
+                        <h4>Real-Time Updates</h4>
+                        <p>Instantly refreshes information as tasks change status.</p>
+                    </div>
+                    <div class="highlight-box">
+                        <h4>Project Tracking</h4>
+                        <p>Follow exact development milestones and target goals.</p>
+                    </div>
+                    <div class="highlight-box">
+                        <h4>Incident Management</h4>
+                        <p>Report and resolve operational bugs or blockers fast.</p>
+                    </div>
+                    <div class="highlight-box">
+                        <h4>Audit Logs</h4>
+                        <p>Review chronological updates of actions inside the platform.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-flex">
+            <p><strong>Project & Operations Manager</strong> &copy; 2026</p>
+            <p>Internal Application Platform | Support: ext-4402</p>
+        </div>
+    </footer>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleModal('loginModal', false)">&times;</span>
+            <h3>Login</h3>
+            <form action="/login" method="POST">
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" name="email" required placeholder="user@company.com">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" name="password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Sign In</button>
+                <p class="modal-footer-text">
+                    <a href="#" onclick="openForgotFromLogin()">Forgot Password?</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleModal('signupModal', false)">&times;</span>
+            <h3>Create Account</h3>
+            <form action="/signup" method="POST">
+                <div class="form-group">
+                    <label for="sig-name">Full Name</label>
+                    <input type="text" id="sig-name" name="name" required placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label for="sig-email">Email Address</label>
+                    <input type="email" id="sig-email" name="email" required placeholder="user@company.com">
+                </div>
+                <div class="form-group">
+                    <label for="sig-pass">Password</label>
+                    <input type="password" id="sig-pass" name="password" required placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label for="sig-confirm">Confirm Password</label>
+                    <input type="password" id="sig-confirm" name="confirm_password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="forgotModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleModal('forgotModal', false)">&times;</span>
+            <h3>Reset Password</h3>
+            <form action="/forgot-password" method="POST">
+                <div class="form-group">
+                    <label for="forgot-email">Account Email Address</label>
+                    <input type="email" id="forgot-email" name="email" required placeholder="user@company.com">
+                </div>
+                <div class="form-group">
+                    <label for="forgot-new-pass">New Password</label>
+                    <input type="password" id="forgot-new-pass" name="new_password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Update Password</button>
+            </form>
+        </div>
+    </div>
+    <div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="toggleModal('loginModal', false)">&times;</span>
+        <h3>Login</h3>
+        
+        <form action="/login" method="POST">
+            <div class="form-group">
+                <label for="login-email">Email Address</label>
+                <input type="email" id="login-email" name="email" required placeholder="user@company.com">
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" name="password" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Sign In</button>
+            <p class="modal-footer-text"><a href="#" onclick="openForgotFromLogin()">Forgot Password?</a></p>
+        </form>
+        
+    </div>
+</div>
+
+    <script>
+        function toggleModal(modalId, show) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = show ? "flex" : "none";
+        }
+
+        function openForgotFromLogin() {
+            toggleModal('loginModal', false);
+            toggleModal('forgotModal', true);
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

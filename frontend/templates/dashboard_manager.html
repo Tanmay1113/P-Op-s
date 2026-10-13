@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Workspace | Project & Operations Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="admin-body">
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <span class="logo-icon">■</span>
+            <span class="logo-text">Ops Manager</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#overview" class="nav-item active">Dashboard</a>
+            <a href="#projects" class="nav-item">Projects</a>
+            <a href="#tasks" class="nav-item">Tasks</a>
+            <a href="#team" class="nav-item">Team Members</a>
+            <a href="#operations" class="nav-item">Operations</a>
+            <a href="#reports" class="nav-item">Reports</a>
+            <a href="#profile" class="nav-item">Profile</a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/logout" class="logout-link">Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        
+        <header class="top-navbar">
+            <div class="nav-left">
+                <h2>Manager Operations Console</h2>
+            </div>
+            <div class="nav-right">
+                <div class="notification-icon">🔔<span class="badge">5</span></div>
+                <div class="user-profile">
+                    <span><strong>{{ session['user_name'] }}</strong> <span class="role-badge">Manager</span></span>
+                    <small>Delivery & Execution</small>
+                </div>
+            </div>
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert-banner">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <section id="overview" class="stats-grid">
+            <div class="stat-card">
+                <small>Total Projects</small>
+                <h3>{{ total_projects }}</h3>
+                <div class="stat-indicator text-muted">Assigned Portfolios</div>
+            </div>
+            <div class="stat-card">
+                <small>Active Projects</small>
+                <h3>{{ active_projects }}</h3>
+                <div class="stat-indicator plus">In Active Execution</div>
+            </div>
+            <div class="stat-card">
+                <small>Pending Tasks</small>
+                <h3>{{ pending_tasks }}</h3>
+                <div class="stat-indicator orange">Awaiting Completion</div>
+            </div>
+            <div class="stat-card">
+                <small>Completed Tasks</small>
+                <h3>{{ completed_tasks }}</h3>
+                <div class="stat-indicator plus">Closed out successfully</div>
+            </div>
+            <div class="stat-card">
+                <small>Open Incidents</small>
+                <h3 class="text-danger">3</h3>
+                <div class="stat-indicator red">Blockers Active</div>
+            </div>
+            <div class="stat-card">
+                <small>Team Members</small>
+                <h3>{{ total_employees }}</h3>
+                <div class="stat-indicator blue">Direct Reports</div>
+            </div>
+        </section>
+
+        <section id="projects" class="content-section">
+            <div class="section-header">
+                <h3>Tracked Portfolios & Projects</h3>
+                <button class="btn btn-primary" onclick="toggleModal('createProjectModal', true)">+ Create New Project</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Project ID</th>
+                            <th>Project Name</th>
+                            <th>Status</th>
+                            <th>Start Date</th>
+                            <th>Deadline</th>
+                            <th>Progress</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for project in projects %}
+                        <tr>
+                            <td>#PRJ-{{ project[0] }}</td>
+                            <td><strong>{{ project[1] }}</strong></td>
+                            <td><span class="status-pill active">{{ project[2] }}</span></td>
+                            <td>{{ project[3] }}</td>
+                            <td>{{ project[4] }}</td>
+                            <td>
+                                <div class="progress-wrapper">
+                                    <small style="font-weight: 600;">{{ project[5] }}%</small>
+                                    <div class="progress-bg"><div class="progress-fill" style="width: {{ project[5] }}%"></div></div>
+                                </div>
+                            </td>
+                            <td>
+                                <button class="action-btn">View</button>
+                                <button class="action-btn">Edit</button>
+                                <button class="action-btn delete">Archive</button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No managed enterprise projects found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="tasks" class="content-section">
+            <div class="section-header">
+                <h3>Task Allocation Pipeline</h3>
+                <button class="btn btn-primary" onclick="toggleModal('createTaskModal', true)">+ Create Task</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Task ID</th>
+                            <th>Task Description</th>
+                            <th>Assigned To</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Due Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks %}
+                        <tr>
+                            <td>#TSK-{{ task[0] }}</td>
+                            <td>{{ task[1] }}</td>
+                            <td><strong>{{ task[2] }}</strong></td>
+                            <td><span class="priority-tag {{ task[3]|lower }}">{{ task[3] }}</span></td>
+                            <td><span class="action-tag">{{ task[4] }}</span></td>
+                            <td>{{ task[5] }}</td>
+                            <td>
+                                <button class="action-btn">Assign</button>
+                                <button class="action-btn">Status</button>
+                                <button class="action-btn delete">Delete</button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No sprints or active delivery tasks logged.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="team" class="content-section">
+            <div class="section-header">
+                <h3>Allocated Engineering & Ops Resources</h3>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Current Project Alignment</th>
+                            <th>Active Tasks Load</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for member in team_members %}
+                        <tr>
+                            <td>#EMP-{{ member[0] }}</td>
+                            <td><strong>{{ member[1] }}</strong></td>
+                            <td>{{ member[2] }}</td>
+                            <td>{{ member[3] if member[3] else "Bench / Unassigned" }}</td>
+                            <td><span class="task-count-badge">{{ member[4] }} Tasks</span></td>
+                            <td>
+                                <button class="action-btn">Assign To Project</button>
+                                <button class="action-btn">View Performance</button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No staff resources registered under your direct profile ledger.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="operations" class="content-section">
+            <div class="section-header">
+                <h3>Operational Incidents & Outages</h3>
+                <button class="btn btn-danger-box" onclick="toggleModal('createIncidentModal', true)">⚠️ File Incident Report</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Incident ID</th>
+                            <th>Title / Summary</th>
+                            <th>Severity</th>
+                            <th>Status</th>
+                            <th>Reported Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for operation in operations %}
+                        <tr>
+                            <td>#INC-{{ operation[0] }}</td>
+                            <td><strong>{{ operation[1] }}</strong></td>
+                            <td><span class="priority-tag {{ operation[2]|lower }}">{{ operation[2] }}</span></td>
+                            <td><span class="status-pill active">{{ operation[3] }}</span></td>
+                            <td>{{ operation[4] }}</td>
+                            <td>
+                                <button class="action-btn">Update</button>
+                                <button class="action-btn delete">Close</button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">All clear. No operational blockers or active incidents found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="reports" class="content-section">
+            <div class="section-header">
+                <h3>Delivery Execution Metrics Summary</h3>
+            </div>
+            <div class="analytics-row-grid">
+                <div class="metric-block-card">
+                    <h4>Project Completion Success Rate</h4>
+                    <div class="chart-mock-placeholder">
+                        <div class="circular-progress-mock">92%</div>
+                    </div>
+                </div>
+                <div class="metric-block-card">
+                    <h4>Resource Productivity Allocation Index</h4>
+                    <div class="chart-mock-placeholder">
+                        <div class="bar-chart-mock">
+                            <div class="bar-fill" style="height:85%;"></div>
+                            <div class="bar-fill" style="height:60%;"></div>
+                            <div class="bar-fill" style="height:90%;"></div>
+                            <div class="bar-fill" style="height:40%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-block-card">
+                    <h4>Risk Assessment Logs</h4>
+                    <ul class="simple-metric-list">
+                        <li>⚠️ Delayed Pipeline Tasks: <strong>4</strong></li>
+                        <li>🚨 Critical Open Incidents: <strong>1</strong></li>
+                        <li>✓ Sprints Successfully Closed: <strong>28</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="createProjectModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleModal('createProjectModal', false)">&times;</span>
+            <h3>Initialize New Core Project</h3>
+            <form action="/manager/create-project" method="POST" style="margin-top: 1rem;">
+                <div class="form-group">
+                    <label>Project Operational Title</label>
+                    <input type="text" name="project_name" required placeholder="Ex: API Gateway Integration">
+                </div>
+                <div class="form-group">
+                    <label>Execution Start Date</label>
+                    <input type="date" name="start_date" required>
+                </div>
+                <div class="form-group">
+                    <label>Hard Target Milestone Deadline</label>
+                    <input type="date" name="deadline" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Provision Infrastructure Workspace</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="createTaskModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleModal('createTaskModal', false)">&times;</span>
+            <h3>Generate Functional Work Sprint Task</h3>
+            <form action="/manager/create-task" method="POST" style="margin-top: 1rem;">
+                <div class="form-group">
+                    <label>Task Description Statement</label>
+                    <input type="text" name="task_name" required placeholder="Ex: Build database indices parameters">
+                </div>
+                <div class="form-group">
+                    <label>Assign Resource Operator</label>
+                    <input type="text" name="assigned_employee" required placeholder="Employee Account Email">
+                </div>
+                <div class="form-group">
+                    <label>Sprint Execution Priority Matrix</label>
+                    <select name="priority" class="form-select">
+                        <option value="Low">Low Priority</option>
+                        <option value="Medium">Medium Priority</option>
+                        <option value="High">High Priority</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Target Target Completion Due Date</label>
+                    <input type="date" name="due_date" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Publish Sprint Node</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="createIncidentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleModal('createIncidentModal', false)">&times;</span>
+            <h3>Log Operational System Incident</h3>
+            <form action="/manager/create-incident" method="POST" style="margin-top: 1rem;">
+                <div class="form-group">
+                    <label>Incident Summary Title</label>
+                    <input type="text" name="title" required placeholder="Ex: Production Pipeline Crash">
+                </div>
+                <div class="form-group">
+                    <label>Blocker Criticality Severity Level</label>
+                    <select name="severity" class="form-select">
+                        <option value="Low">Low (Minor Glitch)</option>
+                        <option value="Medium">Medium (Feature Hindered)</option>
+                        <option value="High">High (Total Execution Blockage)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-danger-box w-100" style="color:white;">Broadcast Incident Advisory</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleModal(id, show) {
+            document.getElementById(id).style.display = show ? "flex" : "none";
+        }
+        // Quick script to handle tab switching inside a single file layout
+document.querySelectorAll('.nav-item').forEach(link => {
+    link.addEventListener('click', function(e) {
+        // Remove active class from all navigation nodes
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Hide all major dashboard content blocks
+        document.querySelectorAll('.content-section').forEach(section => section.style.display = 'none');
+        
+        // Unhide target choice layout explicitly
+        const targetId = this.getAttribute('href').substring(1);
+        const targetSection = document.getElementById(targetId);
+        if(targetSection) targetSection.style.display = 'block';
+    });
+});
+    </script>
+</body>
+</html>

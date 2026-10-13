@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .env
 .venv/
 venv/
@@ -11,3 +12,12 @@ htmlcov/
 .DS_Store
 .idea/
 .vscode/
+=======
+__pycache__/
+*.pyc
+.env
+venv/
+.env.local
+.vscode/
+.idea/
+>>>>>>> c95fd2be38c55bee40da6724b9446c0b27eeda77

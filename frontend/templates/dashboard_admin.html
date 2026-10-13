@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Project & Operations Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="admin-body">
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <span class="logo-icon">■</span>
+            <span class="logo-text">Ops Manager</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#overview" class="nav-item active">Dashboard</a>
+            <a href="#users" class="nav-item">User Management</a>
+            <a href="#managers" class="nav-item">Managers</a>
+            <a href="#projects" class="nav-item">Projects Overview</a>
+            <a href="#audit" class="nav-item">Audit Logs</a>
+            <a href="#reports" class="nav-item">Reports</a>
+            <a href="#settings" class="nav-item">System Settings</a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/logout" class="logout-link">Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        
+        <header class="top-navbar">
+            <div class="nav-left">
+                <h2>Admin Dashboard</h2>
+            </div>
+            <div class="nav-right">
+                <div class="notification-icon">🔔<span class="badge">3</span></div>
+                <div class="user-profile">
+                    <span><strong>{{ session['user_name'] }}</strong></span>
+                    <small>System Administrator</small>
+                </div>
+            </div>
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert-banner">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <section id="overview" class="stats-grid">
+            <div class="stat-card">
+                <small>Total Managers</small>
+                <h3>{{ total_managers }}</h3>
+                <div class="stat-indicator plus">+2 this month</div>
+            </div>
+            <div class="stat-card">
+                <small>Total Employees</small>
+                <h3>{{ total_employees }}</h3>
+                <div class="stat-indicator">Active in System</div>
+            </div>
+            <div class="stat-card">
+                <small>Active Projects</small>
+                <h3>{{ total_projects }}</h3>
+                <div class="stat-indicator blue">Tracking Live</div>
+            </div>
+            <div class="stat-card">
+                <small>Delayed Projects</small>
+                <h3 class="text-danger">{{ delayed_projects }}</h3>
+                <div class="stat-indicator red">Requires Attention</div>
+            </div>
+            <div class="stat-card">
+                <small>Open Incidents</small>
+                <h3>5</h3>
+                <div class="stat-indicator orange">System Reports</div>
+            </div>
+        </section>
+
+        <section id="managers" class="content-section">
+            <div class="section-header">
+                <h3>System User Directory</h3>
+                <button class="btn btn-primary" onclick="toggleModal('addUserModal', true)">+ Add New User</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for manager in managers %}
+                        <tr>
+                            <td>#{{ manager[0] }}</td>
+                            <td><strong>{{ manager[1] }}</strong></td>
+                            <td>{{ manager[2] }}</td>
+                            <td><span class="status-pill active">Enabled</span></td>
+                            <td>
+                                <form action="/admin/disable-manager/{{ manager[0] }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="action-btn">Disable</button>
+                                </form>
+                                
+                                <form action="/admin/remove-manager/{{ manager[0] }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to completely remove this account from the system ledger?');">
+                                    <button type="submit" class="action-btn delete">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="projects" class="content-section">
+            <div class="section-header">
+                <h3>Projects Oversight</h3>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Project Name</th>
+                            <th>Lead Manager</th>
+                            <th>Completion</th>
+                            <th>Deadline</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for project in projects %}
+                        <tr>
+                            <td>{{ project.name }}</td>
+                            <td>{{ project.manager_name }}</td>
+                            <td>
+                                <div class="progress-wrapper">
+                                    <small>{{ project.completion }}%</small>
+                                    <div class="progress-bg"><div class="progress-fill" style="width: {{ project.completion }}%"></div></div>
+                                </div>
+                            </td>
+                            <td>{{ project.deadline }}</td>
+                            <td><button class="btn-sm">View Report</button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="audit" class="content-section">
+            <div class="section-header">
+                <h3>System Audit Logs</h3>
+            </div>
+            <div class="table-container">
+                <table class="data-table log-table">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td><small>{{ log.timestamp }}</small></td>
+                            <td>{{ log.user }}</td>
+                            <td><span class="action-tag">{{ log.action }}</span></td>
+                            <td>{{ log.details }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="addUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleModal('addUserModal', false)">&times;</span>
+            <h3>Onboard New System Profile</h3>
+            <p>Provision workspace environment configurations for platform profiles.</p>
+            <form action="/admin/add-user" method="POST">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" required placeholder="Ex: Jane Cooper">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" required placeholder="jane@company.com">
+                </div>
+                <div class="form-group">
+                    <label>Initial Access Password</label>
+                    <input type="password" name="password" required placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label>Assigned Operational Role</label>
+                    <select name="role" required style="width: 100%; padding: 0.6rem; border: 1px solid #e2e8f0; border-radius: 4px; background-color: #fff; outline: none; font-size: 0.9rem;">
+                        <option value="Manager">Project Manager</option>
+                        <option value="Developer">Developer (Software Engineering)</option>
+                        <option value="QA Tester">QA Tester (Quality Assurance)</option>
+                        <option value="DevOps">DevOps Engineer (Infrastructure)</option>
+                        <option value="Employee">General Employee</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary w-100" style="margin-top: 0.5rem;">Create User Account</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleModal(id, show) {
+            document.getElementById(id).style.display = show ? "flex" : "none";
+        }
+        // Quick script to handle tab switching inside a single file layout
+document.querySelectorAll('.nav-item').forEach(link => {
+    link.addEventListener('click', function(e) {
+        // Remove active class from all navigation nodes
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Hide all major dashboard content blocks
+        document.querySelectorAll('.content-section').forEach(section => section.style.display = 'none');
+        
+        // Unhide target choice layout explicitly
+        const targetId = this.getAttribute('href').substring(1);
+        const targetSection = document.getElementById(targetId);
+        if(targetSection) targetSection.style.display = 'block';
+    });
+});
+    </script>
+</body>
+</html>
