@@ -1,5 +1,5 @@
 from flask import Blueprint
 
-bp = Blueprint("auth", __name__, url_prefix="/auth")
+bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 from . import routes as routes  # noqa: E402
