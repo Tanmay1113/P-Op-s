@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Log operation{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">OPERATIONS</div><h1>Log an operation</h1><p>Record an activity associated with one of your projects.</p></div></div>
+<section class="panel form-panel"><form method="post" class="form-stack"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label for="project_id">Project</label><select id="project_id" name="project_id" required><option value="">Select a project</option>{% for project in projects %}<option value="{{ project.project_id }}">{{ project.name }}</option>{% endfor %}</select><label for="type">Operation description</label><input id="type" name="type" required maxlength="180" placeholder="e.g. Requirements review"><label for="status">Status</label><select id="status" name="status">{% for status in statuses %}<option value="{{ status }}" {% if status == 'Open' %}selected{% endif %}>{{ status }}</option>{% endfor %}</select><div class="form-actions"><a class="button button-outline" href="{{ url_for('operations.list_operations') }}">Cancel</a><button class="button button-dark" type="submit">Save operation</button></div></form></section>
+{% endblock %}

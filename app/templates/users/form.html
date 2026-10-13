@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit user' if user else 'Add user' }}{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">ADMINISTRATION</div><h1>{{ 'Edit user' if user else 'Add a user' }}</h1><p>{{ 'Update role and account access.' if user else 'Create an account for an authorized team member.' }}</p></div></div>
+<section class="panel form-panel"><form method="post" class="form-stack"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+{% if not user %}<label for="username">Username</label><input id="username" name="username" required minlength="3" maxlength="80" autocomplete="off"><label for="email">Email</label><input id="email" name="email" type="email" required maxlength="254"><label for="password">Temporary password</label><input id="password" name="password" type="password" required minlength="12" autocomplete="new-password"><p class="form-hint">Use at least 12 characters. Share credentials securely and ask the user to change them if a password-change feature is later added.</p>{% else %}<div class="readonly-field"><span>Username</span><strong>{{ user.username }}</strong></div><div class="readonly-field"><span>Email</span><strong>{{ user.email }}</strong></div>{% endif %}
+<label for="role">Role</label><select id="role" name="role" required>{% for role in roles %}<option value="{{ role }}" {% if user and user.role == role %}selected{% elif not user and role == 'Employee' %}selected{% endif %}>{{ role }}</option>{% endfor %}</select>
+{% if user %}<label class="check-row"><input type="checkbox" name="active" value="yes" {% if user.is_active_account %}checked{% endif %}> Account is active</label>{% endif %}
+<div class="form-actions"><a class="button button-outline" href="{{ url_for('admin.users') }}">Cancel</a><button class="button button-dark" type="submit">Save user</button></div></form></section>
+{% endblock %}

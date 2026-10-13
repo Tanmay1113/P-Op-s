@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Project and operations management{% endblock %}
+{% block body_class %}landing-body{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">{% endblock %}
+{% block public_content %}
+<div class="landing">
+  <header class="landing-header">
+    <a class="brand" href="{{ url_for('home') }}"><span class="brand-mark">P</span><span>POMS</span></a>
+    <nav class="landing-nav" aria-label="Main navigation"><span>Project workspace</span><a class="button button-dark button-small" href="{{ url_for('auth.login') }}">Sign in <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <main class="landing-main">
+    <section class="hero-copy">
+      <div class="eyebrow"><span class="eyebrow-dot"></span> PROJECT &amp; OPERATIONS MANAGEMENT</div>
+      <h1>Make project work<br>easier to <span>follow.</span></h1>
+      <p class="hero-description">One organized workspace for projects, task assignments, deadlines, and operational follow-through—with access shaped around each team role.</p>
+      <div class="hero-actions"><a class="button button-dark" href="{{ url_for('auth.login') }}">Sign in to workspace <span aria-hidden="true">→</span></a><span class="action-note">For authorized team members</span></div>
+      <div class="feature-strip">
+        <div class="feature-item"><span class="feature-number">01</span><div><strong>Projects</strong><small>Keep work organized</small></div></div>
+        <div class="feature-item"><span class="feature-number">02</span><div><strong>Tasks</strong><small>Clarify ownership</small></div></div>
+        <div class="feature-item"><span class="feature-number">03</span><div><strong>Operations</strong><small>Track follow-through</small></div></div>
+      </div>
+    </section>
+    <section class="preview-wrap" aria-label="Illustrative product preview">
+      <div class="preview-caption"><span>WORKSPACE PREVIEW</span><span class="preview-status"><i></i> Illustrative example</span></div>
+      <div class="preview-window">
+        <div class="preview-top"><div class="preview-dots"><i></i><i></i><i></i></div><span>Overview</span><span class="preview-avatar">M</span></div>
+        <div class="preview-content">
+          <div class="preview-greeting"><div><small>MONDAY WORKSPACE</small><h2>Good work starts<br>with clarity.</h2></div><span class="preview-date">PROJECT OVERVIEW</span></div>
+          <div class="preview-metrics"><div><small>PROJECTS</small><strong>—</strong><span>Live data after sign in</span></div><div><small>TASKS</small><strong>—</strong><span>Live data after sign in</span></div></div>
+          <div class="preview-table"><div class="preview-table-head"><span>WORK ITEM</span><span>STATUS</span></div><div class="preview-row"><span><b class="preview-square square-one"></b><span><strong>Project planning</strong><small>Tasks and ownership</small></span></span><em>Pending</em></div><div class="preview-row"><span><b class="preview-square square-two"></b><span><strong>Operational review</strong><small>Activity tracking</small></span></span><em class="status-open">Open</em></div><div class="preview-row"><span><b class="preview-square square-three"></b><span><strong>Team follow-up</strong><small>Deadline visibility</small></span></span><em>In progress</em></div></div>
+          <p class="preview-footnote">Illustrative interface only · No live or sample metrics shown</p>
+        </div>
+      </div>
+      <div class="preview-side-note"><span>01</span><p>One workspace.<br>Clear responsibilities.</p></div>
+    </section>
+  </main>
+  <footer class="landing-footer"><span> POMS <span class="footer-muted">· Project &amp; Operations Management System</span></span><span>Built for clear ownership and accountable work.</span></footer>
+</div>
+{% endblock %}

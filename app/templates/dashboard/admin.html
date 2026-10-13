@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Admin overview{% endblock %}
+{% block breadcrumb %}Overview{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">ADMINISTRATION</div><h1>Overview</h1><p>Current system totals from the database.</p></div><a class="button button-dark" href="{{ url_for('admin.create_user') }}">Add user <span>+</span></a></div>
+<div class="stats-grid">
+  <article class="stat-card"><span>Total users</span><strong>{{ stats.users }}</strong><small>Registered accounts</small></article>
+  <article class="stat-card"><span>Projects</span><strong>{{ stats.projects }}</strong><small>Across the workspace</small></article>
+  <article class="stat-card"><span>Tasks</span><strong>{{ stats.tasks }}</strong><small>All recorded tasks</small></article>
+  <article class="stat-card"><span>Open operations</span><strong>{{ stats.operations }}</strong><small>Awaiting follow-through</small></article>
+</div>
+<section class="panel"><div class="panel-heading"><div><h2>Recently created projects</h2><p>Latest records currently in the system.</p></div><a class="text-link" href="{{ url_for('projects.list_projects') }}">View projects →</a></div>
+{% if recent_projects %}<div class="table-wrap"><table><thead><tr><th>Project</th><th>Owner</th><th>Status</th><th>Created</th></tr></thead><tbody>{% for project in recent_projects %}<tr><td><a class="table-link" href="{{ url_for('projects.detail', project_id=project.project_id) }}">{{ project.name }}</a></td><td>{{ project.creator.username }}</td><td><span class="status status-{{ project.status|lower|replace(' ','-') }}">{{ project.status }}</span></td><td>{{ project.created_at.strftime('%d %b %Y') }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state"><strong>No projects yet</strong><p>Projects will appear here after they are created.</p></div>{% endif %}</section>
+{% endblock %}

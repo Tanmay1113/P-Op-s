@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="POMS project and operations management">
+  <title>{% block title %}POMS{% endblock %} · POMS</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  {% block styles %}{% endblock %}
+  <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+</head>
+<body class="{% block body_class %}app-body{% endblock %}">
+{% if current_user.is_authenticated %}
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="{{ url_for('dashboard.index') }}"><span class="brand-mark">P</span><span>POMS</span></a>
+    <div class="nav-label">WORKSPACE</div>
+    <nav class="nav-list" aria-label="Main navigation">
+      <a href="{{ url_for('dashboard.index') }}" class="nav-link">Overview</a>
+      {% if current_user.role in ['Admin','Manager'] %}<a href="{{ url_for('projects.list_projects') }}" class="nav-link">Projects</a>{% endif %}
+      <a href="{{ url_for('tasks.list_tasks') }}" class="nav-link">Tasks</a>
+      {% if current_user.role in ['Admin','Manager'] %}<a href="{{ url_for('operations.list_operations') }}" class="nav-link">Operations</a>{% endif %}
+      {% if current_user.role == 'Admin' %}<a href="{{ url_for('admin.users') }}" class="nav-link">User management</a>{% endif %}
+    </nav>
+    <div class="sidebar-bottom"><span class="avatar">{{ current_user.username[:1]|upper }}</span><div class="user-meta"><strong>{{ current_user.username }}</strong><span>{{ current_user.role }}</span></div><form method="post" action="{{ url_for('auth.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="icon-button" type="submit" aria-label="Sign out" title="Sign out">↗</button></form></div>
+  </aside>
+  <main class="main-panel">
+    <header class="topbar"><button class="menu-toggle" type="button" data-sidebar-toggle aria-label="Toggle navigation">☰</button><div class="topbar-context">Workspace <span>/</span> {% block breadcrumb %}Overview{% endblock %}</div><div class="topbar-role">{{ current_user.role }}</div></header>
+    <div class="content-wrap">
+      {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-stack">{% for category, message in messages %}<div class="flash flash-{{ category }}" role="status">{{ message }}<button type="button" data-dismiss aria-label="Dismiss message">×</button></div>{% endfor %}</div>{% endif %}{% endwith %}
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+</div>
+{% else %}
+{% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="public-flashes">{% for category, message in messages %}<div class="flash flash-{{ category }}" role="status">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+{% block public_content %}{% endblock %}
+{% endif %}
+</body>
+</html>

@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Projects{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">WORKSPACE</div><h1>Projects</h1><p>Projects and the work organized within them.</p></div>{% if current_user.role == 'Manager' %}<a class="button button-dark" href="{{ url_for('projects.create_project') }}">New project <span>+</span></a>{% endif %}</div>
+<section class="panel"><div class="table-wrap"><table><thead><tr><th>Project</th><th>Created by</th><th>Tasks</th><th>Status</th><th>Created</th><th></th></tr></thead><tbody>{% for project in projects.items %}<tr><td><strong>{{ project.name }}</strong><div class="cell-sub">{{ project.description|truncate(70) }}</div></td><td>{{ project.creator.username }}</td><td>{{ project.tasks|length }}</td><td><span class="status status-{{ project.status|lower|replace(' ','-') }}">{{ project.status }}</span></td><td>{{ project.created_at.strftime('%d %b %Y') }}</td><td><a class="text-link" href="{{ url_for('projects.detail', project_id=project.project_id) }}">Open →</a></td></tr>{% else %}<tr><td colspan="6">No projects have been created yet.</td></tr>{% endfor %}</tbody></table></div>
+{% if projects.pages > 1 %}<div class="pagination">{% if projects.has_prev %}<a href="{{ url_for('projects.list_projects', page=projects.prev_num) }}">← Previous</a>{% endif %}<span>Page {{ projects.page }} of {{ projects.pages }}</span>{% if projects.has_next %}<a href="{{ url_for('projects.list_projects', page=projects.next_num) }}">Next →</a>{% endif %}</div>{% endif %}</section>
+{% endblock %}

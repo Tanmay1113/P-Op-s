@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block body_class %}auth-body{% endblock %}
+{% block public_content %}
+<main class="auth-layout">
+  <a class="brand auth-brand" href="{{ url_for('home') }}"><span class="brand-mark">P</span><span>POMS</span></a>
+  <section class="auth-card">
+    <div class="eyebrow">TEAM WORKSPACE</div><h1>Welcome back.</h1><p class="muted">Sign in with your authorized account to continue.</p>
+    <form method="post" class="form-stack" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="identity">Username or email</label><input id="identity" name="identity" autocomplete="username" required maxlength="254" autofocus>
+      <div class="password-label"><label for="password">Password</label><button type="button" class="text-button" data-password-toggle="password">Show</button></div>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+      <button class="button button-dark button-full" type="submit">Sign in <span aria-hidden="true">→</span></button>
+    </form>
+    <p>
+    Don't have an account?
+    <a href="{{ url_for('auth.register') }}">Create Account</a>
+</p>
+    <p class="auth-footnote">Need access? Contact your system administrator.</p>
+  </section>
+  <p class="auth-bottom"><a href="{{ url_for('home') }}">← Back to POMS</a><span>Secure team access</span></p>
+</main>
+{% endblock %}
