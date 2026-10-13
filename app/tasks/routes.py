@@ -73,7 +73,7 @@ def update_status(task_id):
         if task.assigned_to != current_user.user_id:
             abort(403)
     else:
-        project = manager_project(task.project_id)
+        manager_project(task.project_id)
     status = request.form.get("status")
     if status not in TASK_STATUSES:
         flash("Choose a valid task status.", "error")

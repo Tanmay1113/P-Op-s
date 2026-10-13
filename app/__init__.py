@@ -1,4 +1,3 @@
-import os
 from dotenv import load_dotenv
 from flask import Flask, render_template, redirect, url_for
 from config import Config
