@@ -1,12 +1,19 @@
+
 from dotenv import load_dotenv
 from flask import Flask, render_template, redirect, url_for
+from flask.cli import with_appcontext
+import click
+
 from config import Config
 from .extensions import db, migrate, login_manager, csrf, limiter
 
+
 def create_app(test_config=None):
     load_dotenv()
+
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(Config)
+
     if test_config:
         app.config.update(test_config)
     else:
@@ -18,6 +25,7 @@ def create_app(test_config=None):
     login_manager.init_app(app)
     csrf.init_app(app)
     limiter.init_app(app)
+
     login_manager.login_view = "auth.login"
     login_manager.login_message_category = "info"
 
@@ -35,11 +43,59 @@ def create_app(test_config=None):
     app.register_blueprint(tasks_bp)
     app.register_blueprint(operations_bp)
 
+    @app.cli.command("seed-admin")
+    @with_appcontext
+    def seed_admin():
+        from .models import User
+
+        email = "admin@company.com"
+        username = "admin"
+        password = "admin@company"
+
+        existing = User.query.filter(
+            db.or_(
+                User.email == email,
+                User.username == username,
+            )
+        ).first()
+
+        if existing:
+            if existing.email == email and existing.role == "Admin":
+                click.echo("Admin account already exists. No changes made.")
+            else:
+                click.echo(
+                    "An account already uses the target email or username. "
+                    "No changes made; inspect the conflict before proceeding."
+                )
+            return
+
+        admin = User(
+            username=username,
+            email=email,
+            role="Admin",
+            is_active_account=True,
+        )
+        admin.set_password(password)
+
+        try:
+            db.session.add(admin)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
+
+        click.echo("Default admin account created successfully.")
+        click.echo(f"Email: {email}")
+        click.echo(f"Username: {username}")
+        click.echo("Password: admin@company")
+
     @app.get("/")
     def home():
         from flask_login import current_user
+
         if current_user.is_authenticated:
             return redirect(url_for("dashboard.index"))
+
         return render_template("index.html")
 
     @app.get("/health")

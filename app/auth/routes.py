@@ -44,14 +44,10 @@ def login():
 
 @bp.route("/register", methods=["GET", "POST"])
 def register():
-    if current_user.is_authenticated:
-        return redirect(url_for("dashboard.index"))
-
-    flash(
-        "Accounts are created by your system administrator.",
-        "info"
+    return (
+        "Public registration is disabled. Contact your system administrator.",
+        403,
     )
-    return render_template("auth/register.html"), 200
 
 
 @bp.post("/logout")
